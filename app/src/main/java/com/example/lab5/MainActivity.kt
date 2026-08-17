@@ -11,12 +11,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.example.lab5.data.mockArticles
 import com.example.lab5.ui.screens.FeedScreen
-import com.example.lab5.ui.theme.Lab5Theme // Asegúrate de que este sea el nombre de tu tema
+import com.example.lab5.ui.theme.Lab5Theme
 
 class MainActivity : ComponentActivity() {
 
-    // ¡IMPORTANTE! Cambia "12345" por tu número de carné real
-    private val TAG = "LAB6_12345"
+
+    private val TAG = "LAB6_25250"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
