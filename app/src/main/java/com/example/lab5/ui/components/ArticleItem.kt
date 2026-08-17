@@ -19,7 +19,7 @@ fun ArticleItem(article: Article, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
             Row(
@@ -32,10 +32,10 @@ fun ArticleItem(article: Article, modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = article.title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = article.extract, fontSize = 14.sp, color = Color.DarkGray)
+            Text(text = article.excerpt, fontSize = 14.sp, color = Color.DarkGray)
             Spacer(modifier = Modifier.height(8.dp))
             Row {
-                Text(text = "${article.readTimeMinutes} min de lectura · ${article.date}", fontSize = 12.sp, color = Color.Gray)
+                Text(text = "${article.readingMinutes} min de lectura · ${article.date}", fontSize = 12.sp, color = Color.Gray)
             }
         }
         Box(modifier = Modifier.size(80.dp).background(Color(article.thumbnailColor)))
