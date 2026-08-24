@@ -37,6 +37,8 @@ import com.example.lab5.ui.components.*
 fun FeedScreen(articles: List<Article>, modifier: Modifier = Modifier) {
 
     // 1. ESTADOS DE LA PANTALLA
+    // FeedScreen es la única dueña de estos cuatro estados. FeedContent solo los recibe
+    // como parámetros y avisa cuando el usuario quiere cambiarlos.
     var searchQuery by rememberSaveable { mutableStateOf("") }
     var showShortReadsOnly by rememberSaveable { mutableStateOf(value = false) }
     var selectedTab by rememberSaveable { mutableStateOf("Para ti") }
@@ -58,7 +60,37 @@ fun FeedScreen(articles: List<Article>, modifier: Modifier = Modifier) {
         matchesSearch && matchesLength && matchesTab
     }
 
-    // 3. INTERFAZ GRÁFICA
+    // 3. FeedScreen delega el dibujo a FeedContent y pasa el estado hacia abajo.
+    // Cada callback actualiza el estado correspondiente aquí arriba.
+    FeedContent(
+        visibleArticles = visibleArticles,
+        searchQuery = searchQuery,
+        onSearchQueryChange = { searchQuery = it },
+        showShortReadsOnly = showShortReadsOnly,
+        onShortReadsOnlyChange = { showShortReadsOnly = it },
+        selectedTab = selectedTab,
+        onTabSelected = { selectedTab = it },
+        applauseCount = applauseCount,
+        onApplaud = { applauseCount++ },
+        modifier = modifier
+    )
+}
+
+// FeedContent no guarda estado propio. Solo lee los valores que recibe y comunica
+// los eventos del usuario hacia arriba mediante los callbacks.
+@Composable
+fun FeedContent(
+    visibleArticles: List<Article>,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    showShortReadsOnly: Boolean,
+    onShortReadsOnlyChange: (Boolean) -> Unit,
+    selectedTab: String,
+    onTabSelected: (String) -> Unit,
+    applauseCount: Int,
+    onApplaud: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val scrollState = rememberScrollState()
 
     Column(
@@ -73,7 +105,7 @@ fun FeedScreen(articles: List<Article>, modifier: Modifier = Modifier) {
         // Controles de Búsqueda
         OutlinedTextField(
             value = searchQuery,
-            onValueChange = { searchQuery = it },
+            onValueChange = onSearchQueryChange,
             label = { Text("Buscar por título o autor") },
             modifier = Modifier.fillMaxWidth(),
         )
@@ -89,13 +121,13 @@ fun FeedScreen(articles: List<Article>, modifier: Modifier = Modifier) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Switch(
                     checked = showShortReadsOnly,
-                    onCheckedChange = { showShortReadsOnly = it }
+                    onCheckedChange = onShortReadsOnlyChange
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Solo lecturas cortas")
             }
 
-            TextButton(onClick = { applauseCount++ }) {
+            TextButton(onClick = onApplaud) {
                 Text("Aplaudir · $applauseCount")
             }
         }
@@ -105,7 +137,7 @@ fun FeedScreen(articles: List<Article>, modifier: Modifier = Modifier) {
         // Pestañas
         TabsRow(
             selectedTab = selectedTab,
-            onTabSelected = { selectedTab = it }
+            onTabSelected = onTabSelected
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -135,4 +167,39 @@ fun FeedScreen(articles: List<Article>, modifier: Modifier = Modifier) {
 @Composable
 fun FeedScreenPreview() {
     FeedScreen(articles = mockArticles)
+}
+
+// Preview con resultados: la búsqueda coincide con el primer artículo de la lista de prueba
+// y se fija un valor de aplausos distinto de cero para ver el contador con datos.
+@Preview(showBackground = true, name = "FeedContent - con resultados")
+@Composable
+fun FeedContentWithResultsPreview() {
+    FeedContent(
+        visibleArticles = mockArticles,
+        searchQuery = "Ana",
+        onSearchQueryChange = { _ -> },
+        showShortReadsOnly = false,
+        onShortReadsOnlyChange = { _ -> },
+        selectedTab = "Para ti",
+        onTabSelected = { _ -> },
+        applauseCount = 3,
+        onApplaud = {}
+    )
+}
+
+// Preview vacío: se envía una lista vacía para comprobar el mensaje de "sin resultados".
+@Preview(showBackground = true, name = "FeedContent - sin resultados")
+@Composable
+fun FeedContentEmptyPreview() {
+    FeedContent(
+        visibleArticles = emptyList(),
+        searchQuery = "xyz",
+        onSearchQueryChange = { _ -> },
+        showShortReadsOnly = false,
+        onShortReadsOnlyChange = { _ -> },
+        selectedTab = "Para ti",
+        onTabSelected = { _ -> },
+        applauseCount = 0,
+        onApplaud = {}
+    )
 }
